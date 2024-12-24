@@ -3,14 +3,14 @@ CCEffect %{
   - passes:
     - vert: godray-vs:vert
       frag: godray-fs:frag
-      pass: godray
+      pass: apply-godray
       depthStencilState:
         depthTest: false
         depthWrite: false
       rasterizerState:
         cullMode: none
       properties:
-        shadowTexture: { value: white }
+        godrayTexture: { value: white }
 }%
 
 CCProgram godray-vs %{
@@ -38,18 +38,13 @@ CCProgram godray-fs %{
 
   in vec2 v_uv;
 
-  uniform Constant {
-    mat4 shadow_matViewProj;
-  };
-
   #pragma rate inputTexture pass
   uniform sampler2D inputTexture;
-  uniform sampler2D shadowTexture;
+  uniform sampler2D godrayTexture;
 
   vec4 frag () {
     vec4 col = texture(inputTexture, v_uv);
     // col = vec4(col.rgb , shadow);
-    col.r = 1.0;
     return col;
   }
 }%

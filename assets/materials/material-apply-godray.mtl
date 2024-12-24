@@ -5,7 +5,7 @@
   "__editorExtras__": {},
   "_native": "",
   "_effectAsset": {
-    "__uuid__": "0f46f934-865c-486e-9532-e918595cee3b",
+    "__uuid__": "c8fa6e11-f558-4639-8303-0914d554abbf",
     "__expectedType__": "cc.EffectAsset"
   },
   "_techIdx": 0,
@@ -25,8 +25,8 @@
   ],
   "_props": [
     {
-      "shadowTexture": {
-        "__uuid__": "40ad6566-3331-4458-b83f-a0860ad7176a",
+      "godrayTexture": {
+        "__uuid__": "283b95b5-ca1a-4fe0-aaba-bc8caa3db530",
         "__expectedType__": "cc.RenderTexture"
       }
     }
