@@ -10,14 +10,16 @@ CCEffect %{
       rasterizerState:
         cullMode: none
       properties:
+        stepSize:      { value: 1.0, target: godrayParam.x }
         shadowTexture: { value: white }
 }%
 
 CCProgram godray-vs %{
   precision highp float;
+  #include <builtin/uniforms/cc-global>
+  #include <legacy/input-standard>
   #include <legacy/decode-standard>
   #include <post-process/pipeline>
-  #include <builtin/uniforms/cc-global>
 
   out vec2 v_uv;
 
@@ -36,20 +38,45 @@ CCProgram godray-vs %{
 CCProgram godray-fs %{
   precision highp float;
 
+  #include <chunk-shadow>
+  #include <common/data/packing>
+  #include <builtin/uniforms/cc-global>
+
   in vec2 v_uv;
 
   uniform Constant {
+    vec4 godrayParam;
     mat4 shadow_matViewProj;
   };
 
-  #pragma rate inputTexture pass
-  uniform sampler2D inputTexture;
+  #pragma rate depthTexture pass
+  uniform sampler2D depthTexture;
   uniform sampler2D shadowTexture;
 
+  #define MAX_SETP 128
+
   vec4 frag () {
-    vec4 col = texture(inputTexture, v_uv);
-    // col = vec4(col.rgb , shadow);
-    col.r = 1.0;
-    return col;
+    float depth = unpackRGBAToDepth(texture(depthTexture, v_uv));
+
+    vec4 ndcPos = vec4(vec3(v_uv, depth) * 2.0 - 1.0, 1.0);
+    ndcPos = cc_matProjInv * ndcPos;
+    ndcPos /= ndcPos.w;
+    vec4 worldPos = cc_matViewInv * ndcPos;
+    vec4 dir = normalize(cc_cameraPos - worldPos);
+
+    float stepSize = godrayParam.x;
+    float totalStrength = 0.0;
+    int actualStep = int(length(worldPos - cc_cameraPos) / stepSize);
+
+    for (int i = 0; i < MAX_SETP; i++) {
+      if (i >= actualStep) {
+        break;
+      }
+      vec4 rayPos = worldPos + dir * float(i) * stepSize;
+      totalStrength += shadowStrength(shadow_matViewProj, rayPos, shadowTexture);
+    }
+
+    float shadow = totalStrength / float(MAX_SETP);
+    return vec4(shadow, shadow, shadow, 1.0);
   }
 }%

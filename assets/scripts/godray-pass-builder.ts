@@ -26,23 +26,9 @@ export class GodrayPassBuilder extends BuiltinPipelinePassBuilder {
     ) {
         cameraConfigs.enableGodray = this.enabled && !!this.material;
         if (cameraConfigs.enableGodray) {
+            cameraConfigs.enableFullPipeline = true;
             cameraConfigs.remainingPasses++;
         }
-    }
-
-    windowResize(
-        ppl: rendering.BasicPipeline,
-        pplConfigs: { readonly [name: string]: any },
-        cameraConfigs: { readonly [name: string]: any },
-        window: renderer.RenderWindow,
-        camera: renderer.scene.Camera,
-        width: number,
-        height: number
-    ): void {
-        // const id = window.renderWindowId;
-        // if (cameraConfigs.enableGodray) {
-        //     ppl.addRenderTarget(`GodRay${id}`, gfx.Format.RGBA8, width, height);
-        // }
     }
 
     setup(
@@ -108,16 +94,13 @@ export class GodrayPassBuilder extends BuiltinPipelinePassBuilder {
         inputDepthStencil: string,
         outputRadianceName: string
     ): rendering.BasicRenderPassBuilder {
-        const id = cameraConfigs.renderWindowId;
-        // const tempRadiance = `GodRay${id}`;
-
         const pass = ppl.addRenderPass(width, height, "godray");
         pass.addRenderTarget(
             outputRadianceName,
             gfx.LoadOp.LOAD,
             gfx.StoreOp.STORE
         );
-        pass.addTexture(inputRadiance, "inputTexture");
+        pass.addTexture(inputRadiance, "depthTexture");
         pass.addQueue(rendering.QueueHint.OPAQUE).addCameraQuad(camera, matrial, 0);
         return pass;
     }

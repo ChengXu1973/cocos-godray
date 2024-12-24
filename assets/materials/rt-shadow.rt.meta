@@ -15,8 +15,8 @@
       "name": "spriteFrame",
       "userData": {
         "imageUuidOrDatabaseUri": "40ad6566-3331-4458-b83f-a0860ad7176a",
-        "width": 2048,
-        "height": 2048
+        "width": 1024,
+        "height": 1024
       },
       "ver": "1.0.0",
       "imported": true,
@@ -27,13 +27,13 @@
     }
   },
   "userData": {
-    "width": 2048,
-    "height": 2048,
+    "width": 1024,
+    "height": 1024,
     "anisotropy": 0,
     "minfilter": "linear",
     "magfilter": "linear",
     "mipfilter": "linear",
-    "wrapModeS": "repeat",
-    "wrapModeT": "repeat"
+    "wrapModeS": "clamp-to-edge",
+    "wrapModeT": "clamp-to-edge"
   }
 }

@@ -11,6 +11,7 @@ CCEffect %{
         cullMode: none
       properties:
         godrayTexture: { value: white }
+        rayColor: { value: [1, 1, 1, 0.2], editor: { type: color } }
 }%
 
 CCProgram godray-vs %{
@@ -42,9 +43,13 @@ CCProgram godray-fs %{
   uniform sampler2D inputTexture;
   uniform sampler2D godrayTexture;
 
+  uniform Constant {
+    vec4 rayColor;
+  };
+
   vec4 frag () {
     vec4 col = texture(inputTexture, v_uv);
-    // col = vec4(col.rgb , shadow);
-    return col;
+    vec4 godray = texture(godrayTexture, v_uv);
+    return col * (1.0 - rayColor.a) + vec4(godray.rgb * rayColor.rgb, godray.a) * rayColor.a;
   }
 }%

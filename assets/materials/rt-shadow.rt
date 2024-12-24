@@ -1,9 +1,9 @@
 {
   "__type__": "cc.RenderTexture",
   "content": {
-    "base": "2,2,0,0,2,0",
-    "w": 2048,
-    "h": 2048,
+    "base": "2,2,2,2,2,0",
+    "w": 1024,
+    "h": 1024,
     "n": "rt-shadow"
   }
 }

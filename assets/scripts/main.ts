@@ -1,4 +1,5 @@
 import { _decorator, Camera, CCFloat, Component, EventTouch, input, Input, instantiate, Material, Node, Renderer, screen, TransformBit, v2, v3 } from "cc";
+import { GodrayPassBuilder } from "./godray-pass-builder";
 const { ccclass, property } = _decorator;
 
 const start = v2();
@@ -9,7 +10,7 @@ const DEPTH_LAYER = 1 << 0;
 
 function setLayer(n: Node, l: number) {
     n.layer = l;
-    n.children?.forEach(c => setLayer(c, l));
+    n.children?.forEach((c) => setLayer(c, l));
 }
 
 @ccclass("Main")
@@ -27,7 +28,7 @@ export class Main extends Component {
     sceneCamera: Camera;
 
     @property(Camera)
-    depthCamera: Camera;
+    godrayCamera: Camera;
 
     @property(Camera)
     shadowCamera: Camera;
@@ -46,7 +47,7 @@ export class Main extends Component {
     }
 
     update() {
-        this.depthCamera.enabled = !!this.scene.hasChangedFlags;
+        this.godrayCamera.enabled = !!this.scene.hasChangedFlags;
         this.shadowCamera.enabled = !!this.scene.hasChangedFlags;
         this._clone.active = !!this.scene.hasChangedFlags;
         if (this.scene.hasChangedFlags) {
@@ -67,7 +68,7 @@ export class Main extends Component {
 
     private _resize() {
         const { width, height } = screen.windowSize;
-        this.depthCamera.targetTexture.resize(width, height);
+        this.godrayCamera.targetTexture?.resize(width, height);
         this.scene.hasChangedFlags |= TransformBit.POSITION;
     }
 
@@ -83,11 +84,12 @@ export class Main extends Component {
     private _setUniform() {
         // 需要主动调用update更新相机的视图投影矩阵
         this.shadowCamera.camera.update(true);
-        // // godray
-        // const godrayPass0 = this.godray.sharedMaterial.passes[0];
-        // godrayPass0.setUniform(
-        //     godrayPass0.getHandle("shadow_matViewProj"),
-        //     this.shadowCamera.camera.matViewProj
-        // );
+        // godray
+        const pass =
+            this.godrayCamera.getComponent(GodrayPassBuilder).material.passes[0];
+        pass.setUniform(
+            pass.getHandle("shadow_matViewProj"),
+            this.shadowCamera.camera.matViewProj
+        );
     }
 }

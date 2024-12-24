@@ -4,6 +4,10 @@
     {
       "name": "DEPTH",
       "value": 1
+    },
+    {
+      "name": "GODRAY",
+      "value": 2
     }
   ]
 }

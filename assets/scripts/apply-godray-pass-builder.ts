@@ -26,6 +26,7 @@ export class ApplyGodrayPassBuilder extends BuiltinPipelinePassBuilder {
     ) {
         cameraConfigs.applyGodray = this.enabled && !!this.material;
         if (cameraConfigs.applyGodray) {
+            cameraConfigs.enableFullPipeline = true;
             cameraConfigs.remainingPasses++;
         }
     }
