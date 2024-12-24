@@ -9,6 +9,14 @@ export class GodrayPassBuilder extends BuiltinPipelinePassBuilder {
     @property(Material)
     material: Material | null = null;
 
+    onEnable() {
+        super.onEnable();
+    }
+
+    onDisable() {
+        super.onDisable();
+    }
+
     // ------------------- rendering.PipelinePassBuilder -------------------
 
     configCamera(
@@ -17,6 +25,9 @@ export class GodrayPassBuilder extends BuiltinPipelinePassBuilder {
         cameraConfigs: { [name: string]: any }
     ) {
         cameraConfigs.enableGodray = this.enabled && !!this.material;
+        if (cameraConfigs.enableGodray) {
+            cameraConfigs.remainingPasses++;
+        }
     }
 
     windowResize(
@@ -28,10 +39,10 @@ export class GodrayPassBuilder extends BuiltinPipelinePassBuilder {
         width: number,
         height: number
     ): void {
-        const id = window.renderWindowId;
-        if (cameraConfigs.enableDof) {
-            ppl.addRenderTarget(`GodRay${id}`, gfx.Format.RGBA8, width, height);
-        }
+        // const id = window.renderWindowId;
+        // if (cameraConfigs.enableGodray) {
+        //     ppl.addRenderTarget(`GodRay${id}`, gfx.Format.RGBA8, width, height);
+        // }
     }
 
     setup(
@@ -45,7 +56,7 @@ export class GodrayPassBuilder extends BuiltinPipelinePassBuilder {
         if (!cameraConfigs.enableGodray) {
             return prevRenderPass;
         }
-        --(cameraConfigs.remainingPasses as number);
+        (cameraConfigs.remainingPasses as number)--;
         if (cameraConfigs.remainingPasses === 0) {
             return this._addGodrayPasses(
                 ppl,
@@ -97,6 +108,17 @@ export class GodrayPassBuilder extends BuiltinPipelinePassBuilder {
         inputDepthStencil: string,
         outputRadianceName: string
     ): rendering.BasicRenderPassBuilder {
-        return null;
+        const id = cameraConfigs.renderWindowId;
+        // const tempRadiance = `GodRay${id}`;
+
+        const pass = ppl.addRenderPass(width, height, "godray");
+        pass.addRenderTarget(
+            outputRadianceName,
+            gfx.LoadOp.LOAD,
+            gfx.StoreOp.STORE
+        );
+        pass.addTexture(inputRadiance, "inputTexture");
+        pass.addQueue(rendering.QueueHint.OPAQUE).addCameraQuad(camera, matrial, 0);
+        return pass;
     }
 }

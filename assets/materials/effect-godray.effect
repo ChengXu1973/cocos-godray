@@ -1,0 +1,49 @@
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: godray-vs:vert
+      frag: godray-fs:frag
+      pass: godray
+      depthStencilState:
+        depthTest: false
+        depthWrite: false
+      rasterizerState:
+        cullMode: none
+      properties:
+}%
+
+CCProgram godray-vs %{
+  precision highp float;
+  #include <legacy/decode-standard>
+  #include <post-process/pipeline>
+  #include <builtin/uniforms/cc-global>
+
+  out vec2 v_uv;
+
+  vec4 vert () {
+    StandardVertInput In;
+    CCDecode(In);
+    FLIP_VULKAN_NDC(In.position);
+
+    v_uv = a_texCoord;
+    CC_HANDLE_RT_SAMPLE_FLIP(v_uv);
+
+    return In.position;
+  }
+}%
+
+CCProgram godray-fs %{
+  precision highp float;
+
+  in vec2 v_uv;
+
+  #pragma rate inputTexture pass
+  uniform sampler2D inputTexture;
+
+  vec4 frag () {
+    vec4 col = texture(inputTexture, v_uv);
+    // col = vec4(col.rgb , shadow);
+    col.r = 1.0;
+    return col;
+  }
+}%
