@@ -1,4 +1,4 @@
-import { _decorator, Camera, CCFloat, Component, EventTouch, input, Input, instantiate, Material, Node, Renderer, screen, TransformBit, v2, v3 } from "cc";
+import { _decorator, Camera, CCFloat, Component, EventTouch, input, Input, instantiate, Material, Node, Renderer, screen, Texture2D, TransformBit, v2, v3 } from "cc";
 import { GodrayPassBuilder } from "./godray-pass-builder";
 const { ccclass, property } = _decorator;
 
@@ -81,7 +81,12 @@ export class Main extends Component {
         this.scene.parent.addChild(this._clone);
         this._clone
             .getComponentsInChildren(Renderer)
-            ?.forEach((mat) => mat.setSharedMaterial(this.depthMaterial, 0));
+            ?.forEach((renderer) => {
+                const mat = renderer.getSharedMaterial(0);
+                const tex = mat.getProperty("mainTexture") as Texture2D;
+                renderer.setMaterialInstance(this.depthMaterial, 0);
+                renderer.getMaterialInstance(0).setProperty("mainTexture", tex);
+            });
     }
 
     private _setUniform() {

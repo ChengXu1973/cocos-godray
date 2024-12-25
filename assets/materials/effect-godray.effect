@@ -10,7 +10,7 @@ CCEffect %{
       rasterizerState:
         cullMode: none
       properties:
-        stepSize:      { value: 1.0, target: godrayParam.x }
+        stepSize:      { value: 0.3, target: godrayParam.x }
         shadowTexture: { value: white }
 }%
 
@@ -65,7 +65,7 @@ CCProgram godray-fs %{
     vec4 dir = normalize(cc_cameraPos - worldPos);
 
     float stepSize = godrayParam.x;
-    float totalStrength = 0.0;
+    float totalShadow = 0.0;
     int actualStep = int(length(worldPos - cc_cameraPos) / stepSize);
 
     for (int i = 0; i < MAX_SETP; i++) {
@@ -73,10 +73,10 @@ CCProgram godray-fs %{
         break;
       }
       vec4 rayPos = worldPos + dir * float(i) * stepSize;
-      totalStrength += shadowStrength(shadow_matViewProj, rayPos, shadowTexture);
+      totalShadow += shadowStrength(shadow_matViewProj, rayPos, shadowTexture);
     }
 
-    float shadow = totalStrength / float(MAX_SETP);
-    return vec4(shadow, shadow, shadow, 1.0);
+    float light = 1.0 - totalShadow / float(MAX_SETP);
+    return vec4(light, light, light, 1.0);
   }
 }%

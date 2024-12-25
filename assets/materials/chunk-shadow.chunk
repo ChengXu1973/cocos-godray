@@ -2,12 +2,14 @@
 
 #define TEXTURE_SIZE 1024.0
 #define SHADOW_BIAS 0.02
+#define SHADOW_FADE 0.05
 
 float shadowStrength (in mat4 matViewProj, in vec4 worldPos, in sampler2D shadowTexture) {
     vec4 shadow_pos = matViewProj * vec4(worldPos.xyz, 1.0);
     vec3 shadowUV = shadow_pos.xyz / shadow_pos.w * 0.5 + 0.5;
     float closest = unpackRGBAToDepth(texture(shadowTexture, shadowUV.xy));
-    return shadowUV.z > closest + SHADOW_BIAS ? 0.0 : 1.0;
+    float limit = closest + SHADOW_BIAS;
+    return clamp((shadowUV.z - limit) / SHADOW_FADE, 0.0, 1.0);
 }
 
 float shadowStrengthPCF2 (in mat4 matViewProj, in vec4 worldPos, in sampler2D shadowTexture) {

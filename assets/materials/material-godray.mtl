@@ -25,7 +25,7 @@
   ],
   "_props": [
     {
-      "stepSize": 0.3,
+      "stepSize": 0.4,
       "shadowTexture": {
         "__uuid__": "40ad6566-3331-4458-b83f-a0860ad7176a",
         "__expectedType__": "cc.RenderTexture"

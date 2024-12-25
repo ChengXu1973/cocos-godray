@@ -5,11 +5,12 @@ CCEffect %{
     - vert: depth-vs:vert
       frag: depth-fs:depth_8bits
       properties: &props
+        mainTexture: { value: white }
   - name: depth-32bits
     passes:
     - vert: depth-vs:vert
       frag: depth-fs:depth_32bits
-      properties: &props
+      properties: *props
 }%
 
 CCProgram depth-vs %{  
@@ -19,8 +20,8 @@ CCProgram depth-vs %{
   #include <legacy/local-batch>
   #include <builtin/uniforms/cc-global>
 
+  out vec2 v_uv;
   out vec4 v_screenPos;
-  out vec4 v_bufferParams;
 
   vec4 vert () {
     vec4 position;
@@ -29,6 +30,7 @@ CCProgram depth-vs %{
     mat4 matWorld, matWorldIT;
     CCGetWorldMatrixFull(matWorld, matWorldIT);
 
+    v_uv = a_texCoord;
     v_screenPos = cc_matProj * (cc_matView * matWorld) * position;
     return v_screenPos;
   }
@@ -40,15 +42,23 @@ CCProgram depth-fs %{
   #include <legacy/output>
   #include <common/data/packing>
 
+  in vec2 v_uv;
   in vec4 v_screenPos;
+  uniform sampler2D mainTexture;
 
   vec4 depth_8bits () {
+    vec4 texColor = texture(mainTexture, v_uv);
+    if (texColor.a < 1.0) discard;
+
     float depth = v_screenPos.z / v_screenPos.w * 0.5 + 0.5;
     vec4 col = vec4(depth, depth, depth, 1.0);
     return CCFragOutput(col);
   }
 
   vec4 depth_32bits () {
+    vec4 texColor = texture(mainTexture, v_uv);
+    if (texColor.a < 1.0) discard;
+
     float depth = v_screenPos.z / v_screenPos.w * 0.5 + 0.5;
     vec4 col = packDepthToRGBA(depth);
     return CCFragOutput(col);
