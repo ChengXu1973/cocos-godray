@@ -53,7 +53,7 @@ CCProgram godray-fs %{
   uniform sampler2D depthTexture;
   uniform sampler2D shadowTexture;
 
-  #define MAX_SETP 128
+  #define MAX_SETP 64
 
   vec4 frag () {
     float depth = unpackRGBAToDepth(texture(depthTexture, v_uv));

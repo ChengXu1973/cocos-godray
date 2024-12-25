@@ -28,6 +28,13 @@
       "godrayTexture": {
         "__uuid__": "283b95b5-ca1a-4fe0-aaba-bc8caa3db530",
         "__expectedType__": "cc.RenderTexture"
+      },
+      "rayColor": {
+        "__type__": "cc.Color",
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 55
       }
     }
   ]
