@@ -44,6 +44,9 @@ export class Main extends Component {
         this._resize();
         this._setScene();
         this._setUniform();
+        this.scheduleOnce(() => {
+            this.scene.hasChangedFlags |= TransformBit.POSITION;
+        }, 0);
     }
 
     update() {
